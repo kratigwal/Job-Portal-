@@ -193,7 +193,7 @@ const Login = () => {
               value={input.email}
               name="email"
               onChange={changeEventHandler}
-              placeholder="patel@gmail.com"
+              placeholder="krati@gmail.com"
             />
           </div>
 
@@ -236,7 +236,7 @@ const Login = () => {
           </div>
 
           {loading ? (
-            <Button className="w-full my-4">
+           <Button disabled className="w-full my-4">
               <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait
             </Button>
           ) : (
