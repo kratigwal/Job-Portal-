@@ -233,6 +233,63 @@ export const register = async (req, res) => {
 };
 
 // ================= LOGIN =================
+// export const login = async (req, res) => {
+//   try {
+//     const { email, password, role } = req.body;
+
+//     if (!email || !password || !role) {
+//       return res.status(400).json({
+//         message: "Something is missing",
+//         success: false
+//       });
+//     }
+
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(400).json({
+//         message: "Invalid credentials",
+//         success: false
+//       });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({
+//         message: "Invalid credentials",
+//         success: false
+//       });
+//     }
+
+//     if (role !== user.role) {
+//       return res.status(400).json({
+//         message: "Role mismatch",
+//         success: false
+//       });
+//     }
+
+//     const token = jwt.sign(
+//       { userId: user._id },
+//       process.env.SECRET_KEY,
+//       { expiresIn: "1d" }
+//     );
+
+//     return res
+//       .cookie("token", token, {
+//         httpOnly: true,
+//         maxAge: 24 * 60 * 60 * 1000
+//       })
+//       .status(200)
+//       .json({
+//         message: `Welcome back ${user.fullname}`,
+//         success: true,
+//         user
+//       });
+
+//   } catch (error) {
+//     console.log("LOGIN ERROR:", error);
+//   }
+// };
+
 export const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
@@ -240,30 +297,32 @@ export const login = async (req, res) => {
     if (!email || !password || !role) {
       return res.status(400).json({
         message: "Something is missing",
-        success: false
+        success: false,
       });
     }
 
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({
         message: "Invalid credentials",
-        success: false
+        success: false,
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(400).json({
         message: "Invalid credentials",
-        success: false
+        success: false,
       });
     }
 
     if (role !== user.role) {
       return res.status(400).json({
         message: "Role mismatch",
-        success: false
+        success: false,
       });
     }
 
@@ -276,17 +335,23 @@ export const login = async (req, res) => {
     return res
       .cookie("token", token, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000
+        secure: true,      // 🔥 IMPORTANT (production fix)
+        sameSite: "none",  // 🔥 IMPORTANT (cross-site fix)
+        maxAge: 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({
         message: `Welcome back ${user.fullname}`,
         success: true,
-        user
+        user,
       });
 
   } catch (error) {
     console.log("LOGIN ERROR:", error);
+    return res.status(500).json({
+      message: "Server error",
+      success: false,
+    });
   }
 };
 
