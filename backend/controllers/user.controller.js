@@ -349,7 +349,7 @@ export const login = async (req, res) => {
       })
       .status(200)
       .json({
-        message: `Welcome back ${user.fullname}`,
+        message: `Welcome  ${user.fullname}`,
         success: true,
         user,
       });
