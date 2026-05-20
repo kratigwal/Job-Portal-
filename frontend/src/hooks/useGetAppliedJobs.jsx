@@ -86,11 +86,7 @@ const useGetAppliedJobs = () => {
                 if (res.data.success) {
 
                     dispatch(
-                        setAllAppliedJobs(
-                            res.data.application || 
-                            res.data.applications || 
-                            []
-                        )
+                        setAllAppliedJobs(res.data.application)
                     );
                 }
 
