@@ -335,8 +335,16 @@ export const login = async (req, res) => {
     return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: true,      // 🔥 IMPORTANT (production fix)
-        sameSite: "none",  // 🔥 IMPORTANT (cross-site fix)
+
+        // ✅ production fix
+        secure: process.env.NODE_ENV === "production",
+
+        // ✅ cross-origin fix
+        sameSite:
+          process.env.NODE_ENV === "production"
+            ? "none"
+            : "lax",
+
         maxAge: 24 * 60 * 60 * 1000,
       })
       .status(200)
@@ -348,6 +356,7 @@ export const login = async (req, res) => {
 
   } catch (error) {
     console.log("LOGIN ERROR:", error);
+
     return res.status(500).json({
       message: "Server error",
       success: false,
