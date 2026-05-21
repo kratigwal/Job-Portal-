@@ -282,7 +282,7 @@
 import React, { useEffect, useState } from 'react'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import {
     APPLICATION_API_END_POINT,
@@ -290,9 +290,7 @@ import {
 } from '@/utils/constant'
 
 import { setSingleJob } from '@/redux/jobSlice'
-
 import { useDispatch, useSelector } from 'react-redux'
-
 import { toast } from 'sonner'
 
 const JobDescription = () => {
@@ -301,14 +299,14 @@ const JobDescription = () => {
     const { user } = useSelector(store => store.auth)
 
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const params = useParams()
-
     const jobId = params.id
 
     const [isApplied, setIsApplied] = useState(false)
 
-    // ================= CHECK ALREADY APPLIED =================
+    // ================= CHECK APPLIED =================
     useEffect(() => {
 
         if (singleJob && user?._id) {
@@ -320,7 +318,7 @@ const JobDescription = () => {
             setIsApplied(applied)
         }
 
-    }, [singleJob, user?._id])
+    }, [singleJob, user])
 
     // ================= FETCH SINGLE JOB =================
     useEffect(() => {
@@ -328,8 +326,6 @@ const JobDescription = () => {
         const fetchSingleJob = async () => {
 
             try {
-
-                if (!jobId) return
 
                 const res = await axios.get(
                     `${JOB_API_END_POINT}/get/${jobId}`,
@@ -339,17 +335,11 @@ const JobDescription = () => {
                 )
 
                 if (res.data.success) {
-
-                    dispatch(
-                        setSingleJob(res.data.job)
-                    )
+                    dispatch(setSingleJob(res.data.job))
                 }
 
             } catch (error) {
-
                 console.log(error)
-
-                toast.error("Failed to load job")
             }
         }
 
@@ -364,6 +354,8 @@ const JobDescription = () => {
         if (!user) {
 
             toast.error("Please login first")
+
+            navigate("/login")
 
             return
         }
@@ -385,16 +377,12 @@ const JobDescription = () => {
                 const updatedJob = {
                     ...singleJob,
                     applications: [
-                        ...singleJob.applications,
-                        {
-                            applicant: user?._id
-                        }
+                        ...(singleJob?.applications || []),
+                        { applicant: user?._id }
                     ]
                 }
 
-                dispatch(
-                    setSingleJob(updatedJob)
-                )
+                dispatch(setSingleJob(updatedJob))
 
                 toast.success(res.data.message)
             }
@@ -411,7 +399,6 @@ const JobDescription = () => {
     }
 
     return (
-
         <div className='max-w-7xl mx-auto my-10'>
 
             {/* HEADER */}
@@ -451,27 +438,19 @@ const JobDescription = () => {
                 </div>
 
                 <Button
-                    onClick={
-                        isApplied
-                            ? null
-                            : applyJobHandler
-                    }
-
+                    onClick={applyJobHandler}
                     disabled={isApplied}
-
                     className={`rounded-lg ${
                         isApplied
                             ? 'bg-gray-600 cursor-not-allowed'
                             : 'bg-[#7209b7] hover:bg-[#5f32ad]'
                     }`}
                 >
-
                     {
                         isApplied
                             ? 'Already Applied'
                             : 'Apply Now'
                     }
-
                 </Button>
 
             </div>
@@ -484,79 +463,56 @@ const JobDescription = () => {
             <div className='my-4'>
 
                 <h1 className='font-bold my-1'>
-
                     Role:
-
                     <span className='pl-4 font-normal text-gray-800'>
                         {singleJob?.title}
                     </span>
-
                 </h1>
 
                 <h1 className='font-bold my-1'>
-
                     Location:
-
                     <span className='pl-4 font-normal text-gray-800'>
                         {singleJob?.location}
                     </span>
-
                 </h1>
 
                 <h1 className='font-bold my-1'>
-
                     Description:
-
                     <span className='pl-4 font-normal text-gray-800'>
                         {singleJob?.description}
                     </span>
-
                 </h1>
 
                 <h1 className='font-bold my-1'>
-
                     Experience:
-
                     <span className='pl-4 font-normal text-gray-800'>
                         {singleJob?.experience} yrs
                     </span>
-
                 </h1>
 
                 <h1 className='font-bold my-1'>
-
                     Salary:
-
                     <span className='pl-4 font-normal text-gray-800'>
                         {singleJob?.salary} LPA
                     </span>
-
                 </h1>
 
                 <h1 className='font-bold my-1'>
-
                     Total Applicants:
-
                     <span className='pl-4 font-normal text-gray-800'>
-                        {singleJob?.applications?.length}
+                        {singleJob?.applications?.length || 0}
                     </span>
-
                 </h1>
 
                 <h1 className='font-bold my-1'>
-
                     Posted Date:
-
                     <span className='pl-4 font-normal text-gray-800'>
-
                         {
                             singleJob?.createdAt
                                 ? singleJob.createdAt.split("T")[0]
                                 : "N/A"
                         }
-
                     </span>
-
                 </h1>
 
             </div>
