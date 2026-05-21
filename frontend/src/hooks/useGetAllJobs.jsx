@@ -1,29 +1,34 @@
-// import { setAllJobs } from '@/redux/jobSlice'
-// import { JOB_API_END_POINT } from '@/utils/constant'
-// import axios from 'axios'
-// import { useEffect } from 'react'
-// import { useDispatch, useSelector } from 'react-redux'
+// import { setAllJobs } from '@/redux/jobSlice';
+// import { JOB_API_END_POINT } from '@/utils/constant';
+// import axios from 'axios';
+// import { useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
 
 // const useGetAllJobs = () => {
-//     const dispatch = useDispatch();
-//     const {searchedQuery} = useSelector(store=>store.job);
-//     useEffect(()=>{
-//         const fetchAllJobs = async () => {
-//             try {
-//                 const res = await axios.get(`${JOB_API_END_POINT}/get?keyword=${searchedQuery}`,{withCredentials:true});
-//                 if(res.data.success){
-//                     dispatch(setAllJobs(res.data.jobs));
-//                 }
-//             } catch (error) {
-//                 console.log(error);
-//             }
+//   const dispatch = useDispatch();
+//   const { searchedQuery } = useSelector(store => store.job);
+
+//   useEffect(() => {
+//     const fetchAllJobs = async () => {
+//       try {
+//         const res = await axios.get(
+//           `${JOB_API_END_POINT}/get?keyword=${searchedQuery || ""}`,
+//           { withCredentials: true } // ✅ only cookie-based auth
+//         );
+
+//         if (res.data.success) {
+//           dispatch(setAllJobs(res.data.jobs));
 //         }
-//         fetchAllJobs();
-//     },[])
-// }
+//       } catch (error) {
+//         console.log("Axios Error:", error.response?.data || error.message);
+//       }
+//     };
 
-// export default useGetAllJobs
+//     fetchAllJobs();
+//   }, [searchedQuery, dispatch]);
+// };
 
+// export default useGetAllJobs;
 
 import { setAllJobs } from '@/redux/jobSlice';
 import { JOB_API_END_POINT } from '@/utils/constant';
@@ -36,22 +41,29 @@ const useGetAllJobs = () => {
   const { searchedQuery } = useSelector(store => store.job);
 
   useEffect(() => {
+
     const fetchAllJobs = async () => {
+
+      // clear previous jobs
+      dispatch(setAllJobs([]));
+
       try {
         const res = await axios.get(
           `${JOB_API_END_POINT}/get?keyword=${searchedQuery || ""}`,
-          { withCredentials: true } // ✅ only cookie-based auth
+          { withCredentials: true }
         );
 
         if (res.data.success) {
           dispatch(setAllJobs(res.data.jobs));
         }
+
       } catch (error) {
         console.log("Axios Error:", error.response?.data || error.message);
       }
     };
 
     fetchAllJobs();
+
   }, [searchedQuery, dispatch]);
 };
 
